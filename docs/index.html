@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Log and Error Manager</title>
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet" />
+		<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="container-fluid">
+			<header id="topheader">
+				<div class="row-fluid">
+					<div class="span12">
+						<h1>&quot;Log and Error Manager&quot;</h1>
+						<span class="label label-inverse">developed by</span> <em>Toppi Giovanni Manuel</em>					
+					</div>
+				</div>
+				<hr />
+			</header>
+			<div class="row-fluid">
+				<div class="span4">
+					<nav id="docmenu" class="well">
+						<ul class="nav nav-list">
+							<li class="nav-header">Docs summary</li>
+							<li>
+								<a href="#intro">Introduction</a>
+								<ul>
+									<li>
+										<a href="#intro_logging">Logging</a>
+									</li>
+									<li>
+										<a href="#intro_error_handling">Custom error handling</a>
+									</li>
+									<li>
+										<a href="#intro_store_log">Store log data</a>
+									</li>
+								</ul>
+							</li>
+							<li><a href="#files">Files</a></li>
+							<li><a href="#installation">Installation</a></li>
+							<li><a href="#usage">Usage description</a></li>
+							<li><a href="#store_view_log">Store/view log</a></li>
+							<li class="divider"></li>
+							<li class="nav-header">API</li>
+							<li><a href="#api_zjlog">Zj.log</a>
+								<ul>
+									<li><a href="#api_zjlog_params">Params</a></li>
+									<li><a href="#api_zjlog_methods">Methods</a></li>
+								</ul>
+							</li>
+							<li class="divider"></li>
+							<li class="nav-header">Samples</li>
+							<li><a href="#sample_code">Sample codes</a></li>
+							<li class="divider"></li>
+						</ul>
+					</nav>
+				</div>
+				<div class="span8">
+					<div id="intro">
+						<h2>Introduction</h2>
+						<p>
+							<em>Log and Error Manager</em> is basically a Javascript system useful in the operations of logging information, storing them remotely and make a better use of console.log.
+							Briefly you can: 
+						</p>
+						<ul>
+							<li>set up <code>production</code> or development environment</li>
+							<li>use without issues console.log also inside &quot;in production&quot; sites and it allows to not throw errors using browsers that don't support console.log</li>
+							<li>custom error handling</li>
+							<li>store remotely generated log errors using a customizable log level</li>
+							<li>use <code>print</code> method to make a better use of console.log</li>
+						</ul>
+						<h4 id="intro_logging">Logging</h4>
+						<p>In some many cases Javascript developers use console.log function to print informations and test the application.<br />
+						With <em>Log and Error Manager</em> you're able to use both console.log and print() method included in order to log messages, without worrying about browser support of console.log and without worrying that the final user displays log messages in his browser console.
+						</p>
+						<p>
+							So you have two options: use <code>console.log</code> function or <code>print</code> function.<br />
+							If you use console.log you have to know that if the browser doesn't support console.log this library creates the console object and the log function.<br />
+							But in this case there is an important difference: console.log will accepts two parameters. The first will be a message or an object, and the second will be a callback function.
+							This permits to use console.log in a secure way and to always handle a log operation using the callback function.<br >
+							But what happens if the browser supports console.log? The browser will log also the function callback.
+						</p>
+						<p>
+							To avoid any kind of problem you can use the print() function. This is a usage sample:
+						</p>
+						<pre>
+							<code>
+function callbackLog (message) {
+	document.write(message);
+}
+
+var log = new ZJ.log({
+	production: false,
+	... // the other parameters
+});
+log.print("my message", callbackLog);
+							</code>
+						</pre>
+						<p>
+							So, after the creation of an instance of Zj.log object, you can call log.print with a message and a callback function. Note that you can pass the message also as an array of values or what you want, and this will be passed as the parameter in the callback.
+							<br />It will happens that log.print will print the message in the browser console and then execute the callback. The callback is an optional parameter. 
+						</p>
+						<h4 id="intro_error_handling">Custom error handling</h4>
+						<p>
+							When an error occurs you can need to handle the error thrown. With Zj.log you can in this way
+						</p>
+						<pre>
+							<code>
+function callbackError (err, url, line) {
+	alert("message: " + err);
+	alert("filename: " + url);
+	alert(lineno: " + line);
+}
+
+var log = new ZJ.log({
+	logErrors: true, // enable event listener on window.onerror
+	errorCallback: callbackError, // the callback called after error generation
+	... // the other parameters
+});
+var x = y;
+							</code>
+						</pre>
+						<p>
+							In this case <em>y</em> variable is undefined and an error occurs. So the callback function <em>callbackError</em> is called.
+							<br />Note that the execution stops when the first error is thrown.
+						</p>
+						<h4 id="intro_store_log">Storing log data</h4>
+						<p>
+							When an error occurs you can need to handle the error thrown. With Zj.log you can in this way
+						</p>
+						<pre>
+							<code>
+var log = new ZJ.log({
+	logErrors: true, // enable event listener on window.onerror
+	sendRemote: true, // indicates if the errors have to be sent remotely
+	remoteURL: "PATH_TO/mem.php", // Store script URL
+	logLevel: 2 // log level. 2 indicates to store also user agent informations
+	... // the other parameters
+});
+							</code>
+						</pre>
+						<p>
+							Note that <em>errorCallback</em> is optional so you can also not pass it to the constructor.
+							<br />Also note that <em>logErrors</em> must be set to true.
+						</p>
+					</div>
+					<hr />
+					<div id="files">
+						<h2>Files</h2>
+						<p>
+							The files included are:
+						</p>
+						<ul>
+							<li><strong>zjlog/js/zj/log.js</strong>: the main Javascript file of the library</li>
+							<li><strong>zjlog/js/zj/log.min.js</strong>: the minified main Javascript file of the library</li>
+							<li><strong>zjlog/viewr.html</strong>: a file that reads log file and prints its rows</li>
+							<li><strong>server/mem.php</strong>: the PHP script included to store JSON data log</li>
+							<li><strong>server/log/log.jsn</strong>: the JSON data log file used by mem.php</li>
+							<li><strong>docs/index.html</strong>: the documentation file (that you are reading now!)</li>
+						</ul>
+					</div>
+					<hr />
+					<div id="installation">
+						<h2>Installation</h2>
+						<p>
+							Copy the directory <em>zjlog</em> inside your application structure. In order to use this system you have only to include <em>zj/log.js</em> inside your web page.
+						</p>
+						<p>
+							<code>
+								&lt;script src=&quot;PATH_TO/js/zj/log.js&quot;&gt;&lt;/script&gt;
+							</code>
+						</p>
+						<p>
+							If you want to use remote storing functionality also copy the <em>server</em> directory and then refer to the mem.php file when you create the Zj.log instance.
+						</p>
+						<p>
+							Be sure that log/log.jsn has write permissions.
+						</p>
+					</div>
+					<hr />
+					<div id="usage">
+						<h2>Using Zj.log</h2>
+						<p>
+							To use this library you have only to instantiate a Zj.log object following this documentation and if you need, define the various callback functions.
+						</p>
+						<h4>Why &quot;zj&quot;?</h4>
+						<p>
+							Zj simply represents a namespace derived from my main nickname &quot;zijua&quot;!
+						</p>
+					</div>
+					<hr />
+					<div id="api_zjlog">
+						<h2>API</h2>
+						<h4 id="api_zjlog_params">Zj.log object parameters</h4>
+						<table class ="table compact table-striped">
+						    <tr class="header-row">
+						        <th>Parameter</th>
+						        <th>Value</th>
+						        <th>Default value</th>
+						        <td>Description</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>production</td>
+						        <td>{true, false}</td>
+						        <td>true</td>
+						        <td>in production mode console.log and print method are disabled</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>logErrors</td>
+						        <td>{true, false}</td>
+						        <td>false</td>
+						        <td>if true event window.error is managed by the library</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>sendRemote</td>
+						        <td>{true, false}</td>
+						        <td>false</td>
+						        <td>if true log messages are sent to remoteURL using GET HTTP method</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>remoteURL</td>
+						        <td>string</td>
+						        <td>&nbsp;</td>
+						        <td>the URL of the remote script that manage log data (you can point to mem.php file included)</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>logLevel</td>
+						        <td>{1, 2}</td>
+						        <td>1</td>
+						        <td>log error level: <ul class="unstyled"><li>1: only message, line number and URL</li><li>2: log level 1 + userAgent</li></ul></td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>errorCallback</td>
+						        <td>function(err, url, line)</td>
+						        <td>&nbsp;</td>
+						        <td>a custom callback when an error occurs. Receive message, URL and line of the error thown. Example: 
+<pre><code>
+function callbackHandler(err, url, line) {
+	document.write(err); 
+	document.write(line); 
+	document.write(url);
+}</code></pre>
+						        </td>
+						    </tr>
+						</table>
+						<br /><br />
+						<h4 id="api_zjlog_methods">Zj.log object methods</h4>
+						<h5>print(description, callback)</h5>
+						<p>
+							<code>print</code> method is use in substitution of console.log. Note that this method is executed only if production parameter is set to false, otherwise nothing happens. After having an instance of a Zj.log object you can call it as:
+						</p>
+						<pre>
+							<code>
+function callbackLog (message) {
+	alert(message);
+}
+
+window.onload = function () {
+	var log = new ZJ.log({
+		production: false,
+		... // the other parameters 
+	});
+};
+
+log.print("my log text", callbackLog); // it writes in browser console and after call callbackLog
+							</code>
+						</pre>
+						<table class ="table response-codes compact table-striped">
+						    <tr class="header-row">
+						        <th>Parameter</th>
+						        <th>Value</th>
+						        <th>Default value</th>
+						        <td>Description</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>description</td>
+						        <td>string</td>
+						        <td>&nbsp;</td>
+						        <td>the text to send to console.log</td>
+						    </tr>
+						    <tr class="subheader-row">
+						        <td>callback</td>
+						        <td>function(message)</td>
+						        <td>undefined</td>
+						        <td>a custom callback (optional). Receive description text. Example: 
+<pre><code>
+function callbackLog (message) {
+	document.write(message);
+}</code></pre>
+						        </td>
+						    </tr>
+						</table>
+					</div>
+					<div id="store_view_log">
+						<h2>Store/view log</h2>
+						<p>
+							<em>Log and Error Manager</em> includes server side scripts written with PHP language useful to store error log informations. By default these information are stored inside server/log/log.jsn file, in a JSON format.
+						</p>
+						<p>
+							You can read all saved data opening viewr.html file with your browser.
+							<br />
+							Maybe you will need to modify the following row to change the URL pointing to the log file
+							<br />
+							<code>$.getJSON( "server/log/log.jsn", function (data) {</code>
+						</p>
+					</div>
+					<div id="sample_code">
+						<h2>Sample codes</h2>
+						<div class="sample">
+							<h4>Sample 1</h4>
+							<pre>
+								<code>
+	function callbackError (err, url, line) {
+		alert("message: " + err);
+		alert("filename: " + url);
+		alert("lineno: " + line);
+	}
+	
+	window.onload = function () {
+		var log = new ZJ.log({
+			production: true,
+			logErrors: true,
+			errorCallback: callbackError, 
+			sendRemote: true, 
+			remoteURL: "server/mem.php", 
+			logLevel: 2 
+		});
+	};
+								</code>
+							</pre>
+							<p>
+								This is an example that makes a new instance of a Zj.log object and has the following behaviour:
+							</p>
+							<ul>
+								<li>set the <code>production</code> environment to true, so that console.log and print method (explained after) are disabled</li>
+								<li>set <code>logErrors</code> to true, so that the script can catch browser errors and then call the function set up with <code>errorCallback</code> parameter</li>
+								<li>set <code>sendRemote</code> to true enable the remote error storing system. <code>remoteURL</code> is the path to the mem.php file or to your store script</li>
+								<li>set <code>logLevel</code> to 2 in order to include also information about client user agent</li>
+							</ul>
+						</div>
+						<div class="sample">
+							<h4>Sample 2</h4>
+							<pre>
+								<code>
+		var log = new ZJ.log({
+			production: true,
+			logErrors: true,
+			sendRemote: true, 
+			remoteURL: "server/mem.php", 
+			logLevel: 1
+		});
+								</code>
+							</pre>
+							<p>
+								This is an example that makes a new instance of a Zj.log object and has the following behaviour:
+							</p>
+							<ul>
+								<li>set the <code>production</code> environment to true, so that console.log and print method (explained after) are disabled</li>
+								<li>set <code>logErrors</code> to true, so that the script can catch browser errors but doesn't need a callback function</li>
+								<li>set <code>sendRemote</code> to true enable the remote error storing system. <code>remoteURL</code> is the path to the mem.php file or to your store script</li>
+								<li>set <code>logLevel</code> to 1 so that only error informations are stored (without user agent)</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="libs/jquery-1.8.3.min.js"><\/script>')</script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

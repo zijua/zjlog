@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Log Viewr</title>
+		<link href="bootstrap/css/bootstrapskin.css" rel="stylesheet" />
+		<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div id="res">
+			<table id="list" class="table table-bordered table-striped">
+				<tr>
+					<th>Date</th>
+					<th>Message</th>
+					<th>URL</th>
+					<th>Line</th>
+					<th>User Agent</th>
+				</tr>
+			</table>
+		</div>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="js/libs/jquery-1.8.3.min.js"><\/script>')</script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script>
+			$.getJSON( "server/log/log.jsn", function (data) {
+					var i = 0,
+						l = (typeof data === "object" && data !== null) ? data.length : 0,
+						row = "",
+						items = (typeof data === "object" && data !== null) ? data.reverse() : [];
+					for (i = 0; i < l; i += 1) {
+						row = '<tr>';
+						row += '<td>' + items[i].date + '</td>';
+						row += '<td>' + items[i].message + '</td>';
+						row += '<td>' + items[i].url + '</td>';
+						row += '<td>' + items[i].line + '</td>';
+						row += '<td>' + items[i].userAgent + '</td>';
+						row += '<tr>';
+						$("#list").append(row);
+					}
+				}
+			);
+		</script>
+	</body>
+</html>
